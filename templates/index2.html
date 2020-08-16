@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!--js로 ajax를 통해 바로 구현 한 버전 -->
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+
+    <title>Min's Jarvis</title>
+    <style>
+        body {
+            background-image: url('../static/phone.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>
+    <style type="text/css">
+        * {
+            font-family: 'Stylish', sans-serif;
+        }
+
+        .HomepageLayout {
+            height: 100%
+        }
+
+        .HeaderText {
+            float: right;
+            background: rgba(0, 0, 0, .6);
+            color: #ffffff;
+            height: 64px;
+            width: 650px;
+            border-radius: 2px 2px 30px 30px;
+        }
+
+        .header-li {
+            font-family: sans-serif;
+            margin-right: 3rem;
+            padding: 1.5rem;
+            float: right;
+        }
+
+        .Blank {
+            background: transparent;
+            width: 40%;
+            height: 64px;
+        }
+
+        .BodyClass {
+            margin-top: 100px;
+            margin-left: 30px;
+            margin-right: 30px;
+            display: flex;
+        }
+
+        .left-body {
+            width: 33.3%;
+            margin-right: 20px;
+        }
+
+        .mid-body {
+            width: 33.3%;
+            margin-right: 20px;
+        }
+
+        .right-body {
+            width: 33.3%;
+        }
+
+        .mar {
+            margin-top: 30px;
+            margin-left: 30px;
+            margin-right: 30px;
+            text-align: center;
+        }
+
+        .form-control {
+            margin: auto;
+            width: 60%;
+        }
+
+        .btm_image {
+            width: 30px;
+            height: 30px;
+        }
+
+        .BottomClass {
+            margin-top: 30px;
+        }
+
+    </style>
+    <script>
+        function openClose_1() {
+            // id 값 post-box의 display 값이 block 이면(= 눈에 보이면)
+            if ($("#post-box-1").css("display") == "block") {
+                // post-box를 가리고
+                $("#post-box-1").hide();
+                // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
+                $("#btn-post-box_1").text("클릭");
+            } else {
+                // 아니면(눈에 보이지 않으면) post-box를 펴라
+                $("#post-box-1").show();
+                // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
+                $("#btn-post-box_1").text("닫기");
+            }
+        }
+
+        function openClose() {
+            // id 값 post-box의 display 값이 block 이면(= 눈에 보이면)
+            if ($("#post-box").css("display") == "block") {
+                // post-box를 가리고
+                $("#post-box").hide();
+                // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
+                $("#btn-post-box_2").text("포스팅 박스 열기");
+            } else {
+                // 아니면(눈에 보이지 않으면) post-box를 펴라
+                $("#post-box").show();
+                // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
+                $("#btn-post-box_2").text("포스팅 박스 닫기");
+            }
+        }
+
+        function weatherOpen() {
+            // let cities = ['Busan', 'Daegu', 'Incheon', 'Gwangju', 'Daejeon', 'Sejong', 'Seoul', 'Ulsan'];
+            let city = $('#InputCity').val()
+            let id = '8d1ead38edadb80507571247b37862bb'
+            let apiURL = "http://api.openweathermap.org/data/2.5/weather";
+            $.ajax({
+                url: apiURL,
+                dataType: "json",
+                type: "GET",
+                data: {q: city, appid: id},
+                success: function (response) {
+                    let temp = response['main']['temp'];
+                    let x = response['weather'][0]['icon'];
+                    let img_addr = "https://openweathermap.org/img/wn/" + x + "@2x.png";
+                    let cel_temp = fartocel(temp);
+                    let main = response['weather'][0]['main'];
+                    let description = response['weather'][0]['description'];
+                    let tempHtml = `<img src= ${img_addr}><li>${city} : ${cel_temp} °C</br>
+날씨 : ${main}</br>
+설명 : ${description}</li>`;
+                    $("#card-temp").append(tempHtml);
+
+                }
+            })
+        }
+
+        function fartocel(temp) {
+            // celcius = far - 273.15임.
+            let celcius = temp - 273.15;
+            //소수점 1자리 까지 표현
+            return celcius.toFixed(1);
+        }
+
+        function delinfo() {
+            $('#card-temp').empty();
+        }
+    </script>
+
+</head>
+
+<body>
+<div id=root style="height:100%">
+    <div class="HomepageLayout">
+        <div class="HeaderClass">
+            <div>
+                <div class="HeaderText">
+                    <ul>
+                        <li class="header-li">Bottom</li>
+                        <li class="header-li">Body</li>
+                        <li class="header-li">Head</li>
+                        <li class="header-li">Home</li>
+                    </ul>
+                </div>
+                <div class="Blank">
+                </div>
+            </div>
+        </div>
+        <div class="BodyClass">
+            <div class="left-body">
+                <div class="card">
+                    <div class="mar">
+                        <img src="../static/league.jpeg" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">좋아하는 팀을 고르세요</h5>
+                            <div class="form-group">
+                                <label for="InputTeam">Teams</label>
+                                <select class="form-control" id="InputTeam">
+                                    <option>리버풀 FC</option>
+                                    <option>맨체스터 시티 FC</option>
+                                    <option>맨체스터 유나이티드 FC</option>
+                                    <option>첼시 FC</option>
+                                    <option>레스터 시티 FC</option>
+                                    <option>토트넘 홋스퍼 FC</option>
+                                    <option>울버햄튼 원더러스 FC</option>
+                                    <option>아스널 FC</option>
+                                    <option>셰필드 유나이티드 FC</option>
+                                    <option>번리 FC</option>
+                                    <option>사우샘프턴 FC</option>
+                                    <option>에버턴 FC</option>
+                                    <option>뉴캐슬 유나이티드 FC</option>
+                                    <option>크리스탈 팰리스 FC</option>
+                                    <option>브라이튼 앤 호브 알비온 FC</option>
+                                    <option>웨스트햄 유나이티드 FC</option>
+                                    <option>아스톤 빌라 FC</option>
+                                    <option>AFC 본머스</option>
+                                    <option>왓포드 FC</option>
+                                    <option>노리치 시티 FC</option>
+                                </select>
+                            </div>
+                            <button onclick="openClose_1()" id="btn-post-box_1" type="button" class="btn btn-primary">클릭
+                            </button>
+                            <div class="text-box" id="post-box-1" style="display:none">정보 나오는
+                                <칸></칸>
+                            </div>
+                            <!--                            <div class="text-box" id="post-box" style="display:none">뉴스 속보를 알려드리는 칸입니다.</div>-->
+
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+            </div>
+            <div class="mid-body">
+                <div class="card">
+                    <div class="mar">
+                        <img src="../static/news.jpg" class="card-img-top" alt="..." style="width:50%">
+                        <div class="card-body">
+                            <h5 class="card-title">뉴스 속보</h5>
+                            <button onclick="openClose()" id="btn-post-box_2" type="button" class="btn btn-primary">포스팅
+                                박스
+                                열기
+                            </button>
+                            <div class="text-box" id="post-box" style="display:none">속보 나오는 칸</div>
+
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+            </div>
+            <div class="right-body">
+                <div class="card">
+                    <div class="mar">
+                        <img src="../static/weather.png" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">날 씨</h5>
+                            <div class="form-group">
+                                <label for="InputCity">지 역</label>
+                                <select class="form-control" id="InputCity">
+                                    <option>Busan</option>
+                                    <option>Daegu</option>
+                                    <option>Incheon</option>
+                                    <option>Gwangju</option>
+                                    <option>Daejeon</option>
+                                    <option>Sejong</option>
+                                    <option>Seoul</option>
+                                    <option>Ulsan</option>
+                                </select>
+                            </div>
+                            <div class="inline-box">
+                                <!--이건 robo3t에 db저장해서 쓰자.-->
+                                <button onclick="weatherOpen()" id="btn-post-box_3" type="button"
+                                        class="btn btn-primary">날씨 요청
+                                </button>
+                                <button onclick="delinfo()">RESET</button>
+                                <!--이건 바로 open api 에 바로 요청 할때 쓰자.-> 이거 할떄 시간 갱신되게.-->
+                                <button type="button" class="btm_image" id="img_btn"><img src="../static/refresh.png"
+                                                                                          style="width:100%" ;></button>
+                            </div>
+                            <p class="card-text" id="card-temp"></p>
+
+
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+</body>
+</html>
